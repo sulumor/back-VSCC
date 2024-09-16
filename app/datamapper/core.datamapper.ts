@@ -1,33 +1,36 @@
-import client from "../helpers/pg.client.js";
+import client from "../helpers/pg.client";
 
 export default class CoreDatamapper {
-  static tableName;
+  static tableName: any;
 
-  static insertTable;
+  static insertTable: any;
 
-  static updateTable;
+  static updateTable: any;
 
   static async findAll() {
     const result = await client.query(`SELECT * FROM "${this.tableName}"`);
     return result.rows;
   }
 
-  static async findByPk(id) {
-    const result = await client.query(`SELECT * FROM "${this.tableName}" WHERE id=$1`, [id]);
+  static async findByPk(id: any) {
+    const result = await client.query(
+      `SELECT * FROM "${this.tableName}" WHERE id=$1`,
+      [id]
+    );
     return result.rows[0];
   }
 
-  static async findByParams(params) {
+  static async findByParams(params: { where: any }) {
     let filter = "";
-    const values = [];
+    const values: unknown[] = [];
 
     if (params.where) {
-      const filters = [];
+      const filters: string[] = [];
       let indexPlaceholder = 1;
 
       Object.entries(params.where).forEach(([param, value]) => {
         if (param === "or") {
-          const filtersOr = [];
+          const filtersOr: string[] = [];
           Object.entries(value).forEach(([key, val]) => {
             filtersOr.push(`"${key}" = $${indexPlaceholder}`);
             values.push(val);
@@ -42,22 +45,32 @@ export default class CoreDatamapper {
       });
       filter = `WHERE ${filters.join(" AND ")}`;
     }
-    const result = await client.query(`SELECT * FROM "${this.tableName}" ${filter}`, values);
+    const result = await client.query(
+      `SELECT * FROM "${this.tableName}" ${filter}`,
+      values
+    );
     return result.rows;
   }
 
-  static async insert(data) {
-    const result = await client.query(`SELECT * FROM ${this.insertTable}($1)`, [data]);
+  static async insert(data: any) {
+    const result = await client.query(`SELECT * FROM ${this.insertTable}($1)`, [
+      data,
+    ]);
     return result.rows[0];
   }
 
-  static async update(data) {
-    const result = await client.query(`SELECT * FROM ${this.updateTable}($1)`, [data]);
+  static async update(data: any) {
+    const result = await client.query(`SELECT * FROM ${this.updateTable}($1)`, [
+      data,
+    ]);
     return result.rows[0];
   }
 
-  static async delete(id) {
-    const result = await client.query(`DELETE FROM "${this.tableName}" WHERE "id" = $1`, [id]);
+  static async delete(id: any) {
+    const result = await client.query(
+      `DELETE FROM "${this.tableName}" WHERE "id" = $1`,
+      [id]
+    );
     return !!result.rowCount;
   }
 }

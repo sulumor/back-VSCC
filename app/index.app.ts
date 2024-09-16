@@ -2,11 +2,11 @@ import express from "express";
 import path from "node:path";
 import cors from "cors";
 import helmet from "helmet";
-import createDoc from "./helpers/swagger.doc.js";
-import corsOptions from "./helpers/cors.options.js";
-import Limiter from "./helpers/rateLimiter.config.js";
-import router from "./routers/index.router.js";
-import errorMiddleware from "./middlewares/error.middleware.js";
+import createDoc from "./helpers/swagger.doc";
+import corsOptions from "./helpers/cors.options";
+import Limiter from "./helpers/rateLimiter.config";
+import router from "./routers/index.router";
+import errorMiddleware from "./middlewares/error.middleware";
 
 const app = express();
 

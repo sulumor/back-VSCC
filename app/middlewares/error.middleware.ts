@@ -9,8 +9,8 @@ import logger from "../logger/index.logger.js";
  * @returns {Express.Response}
  *
  */
-export default (err, _, res, __) => {
-  if (err.httpStatus === 500) logger.error(null, err);
+export default (err: any, _: any, res: any, __: any): Express.Response => {
+  if (err.httpStatus === 500) logger.error("null", err);
   if (err.format === "html") {
     return res.status(err.httpStatus).render("error", { error: err });
   }

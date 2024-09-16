@@ -1,3 +1,4 @@
+import { Application } from "express";
 import expressJSDocSwagger from "express-jsdoc-swagger";
 import * as url from "node:url";
 
@@ -13,7 +14,7 @@ const options = {
   // Base directory which we use to locate your JSDOC files
   baseDir: dirname,
   // Glob pattern to find your jsdoc files (multiple patterns can be added in an array)
-  filesPattern: "./**/*.js",
+  filesPattern: "./**/*.ts",
   // URL where SwaggerUI will be rendered
   swaggerUIPath: "/api-docs",
   // Expose OpenAPI UI
@@ -30,4 +31,4 @@ const options = {
   swaggerUiOptions: {},
 };
 
-export default (app) => expressJSDocSwagger(app)(options);
+export default (app: Application) => expressJSDocSwagger(app)(options);

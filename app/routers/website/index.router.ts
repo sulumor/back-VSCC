@@ -1,7 +1,7 @@
 import express from "express";
-import WebsiteError from "../../errors/website.error.js";
-import controllerWrapper from "../../helpers/controller.wrapper.js";
-import controller from "../../controllers/website.controller.js";
+import WebsiteError from "../../errors/website.error";
+import controllerWrapper from "../../helpers/controller.wrapper";
+import controller from "../../controllers/website.controller";
 
 const websiteRouter = express.Router();
 
