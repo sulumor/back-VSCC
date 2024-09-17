@@ -1,0 +1,5 @@
+%syntax-version=1.0.0
+%project=VSCC
+
+init 2024-09-17T07:00:01Z Romuald Patfoort <romuald.patfoort@gmail.com> # initialisation de la BDD
+constraint 2024-09-17T07:40:05Z Romuald Patfoort <romuald.patfoort@gmail.com> # add constraints to table
