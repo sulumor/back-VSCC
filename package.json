@@ -10,7 +10,8 @@
     "prepare": "husky",
     "test": "NODE_OPTIONS=--experimental-vm-modules npx jest",
     "start": "node dist/index.js",
-    "build": "node tsup index.ts --format cjs --clean"
+    "build": "node tsup index.ts --format cjs --clean",
+    "db:seeding": "psql -d VSCC -f app/data/seeding.fakers.sql"
   },
   "keywords": [
     "template",

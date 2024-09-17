@@ -3,9 +3,10 @@
 BEGIN;
 
 ALTER TABLE "user"
-  DROP CONSTRAINT "email_constraint", "password_constraint";
+  DROP CONSTRAINT "email_constraint";
 
 ALTER TABLE "trace"
-  DROP CONSTRAINT "stravaId_constraint", "stravaHash_constraint";
+  DROP CONSTRAINT "stravaId_constraint", 
+  DROP CONSTRAINT "stravaHash_constraint";
 
 COMMIT;
