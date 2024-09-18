@@ -34,8 +34,6 @@
  * @property { number } elevation
  * @property { string } description
  * @property { string } image
- * @property { Date } created_at
- * @property { Date } updated_at
  */
 
 /**
@@ -50,4 +48,23 @@
  * @property { number } elevation
  * @property { string } description
  * @property { string } image
+ */
+
+// USERS
+
+/**
+ * @typedef { object } User
+ * @property { string } id
+ * @property { string } firstname
+ * @property { string } email
+ * @property { string } password
+ * @property { boolean } is_admin
+ */
+
+/**
+ * @typedef { object } UserBody
+ * @property { string } firstname
+ * @property { string } email
+ * @property { string } password
+ * @property { boolean } is_admin
  */
