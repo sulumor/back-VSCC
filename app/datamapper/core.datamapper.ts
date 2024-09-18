@@ -1,18 +1,17 @@
+import type { Traces, Trace } from "@/@Types/traces.types";
 import client from "../helpers/pg.client";
 
 export default class CoreDatamapper {
-  static tableName: any;
+  static tableName: string;
+  static insertTable: string;
+  static updateTable: string;
 
-  static insertTable: any;
-
-  static updateTable: any;
-
-  static async findAll() {
+  static async findAll(): Promise<Traces> {
     const result = await client.query(`SELECT * FROM "${this.tableName}"`);
     return result.rows;
   }
 
-  static async findByPk(id: any) {
+  static async findByPk(id: string): Promise<Trace> {
     const result = await client.query(
       `SELECT * FROM "${this.tableName}" WHERE id=$1`,
       [id]
@@ -20,7 +19,7 @@ export default class CoreDatamapper {
     return result.rows[0];
   }
 
-  static async findByParams(params: { where: any }) {
+  static async findByParams(params: { where: any }): Promise<Traces> {
     let filter = "";
     const values: unknown[] = [];
 
@@ -28,7 +27,7 @@ export default class CoreDatamapper {
       const filters: string[] = [];
       let indexPlaceholder = 1;
 
-      Object.entries(params.where).forEach(([param, value]) => {
+      Object.entries(params.where).forEach(([param, value]: [string, any]) => {
         if (param === "or") {
           const filtersOr: string[] = [];
           Object.entries(value).forEach(([key, val]) => {
@@ -52,21 +51,21 @@ export default class CoreDatamapper {
     return result.rows;
   }
 
-  static async insert(data: any) {
+  static async insert(data: Partial<Trace>): Promise<Trace> {
     const result = await client.query(`SELECT * FROM ${this.insertTable}($1)`, [
       data,
     ]);
     return result.rows[0];
   }
 
-  static async update(data: any) {
+  static async update(data: Partial<Trace>): Promise<Trace> {
     const result = await client.query(`SELECT * FROM ${this.updateTable}($1)`, [
       data,
     ]);
     return result.rows[0];
   }
 
-  static async delete(id: any) {
+  static async delete(id: string): Promise<boolean> {
     const result = await client.query(
       `DELETE FROM "${this.tableName}" WHERE "id" = $1`,
       [id]

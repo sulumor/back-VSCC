@@ -1,9 +1,9 @@
-import express from "express";
+import { Router } from "express";
 import WebsiteError from "../../errors/website.error";
 import controllerWrapper from "../../helpers/controller.wrapper";
-import controller from "../../controllers/website.controller";
+import controller from "../../controllers/website/website.controller";
 
-const websiteRouter = express.Router();
+const websiteRouter = Router();
 
 /**
  * GET /
