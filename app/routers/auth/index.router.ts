@@ -1,14 +1,14 @@
 import { Router } from "express";
-import AuthController from "../../controllers/auth.controller";
-import controllerWrapper from "../../helpers/controller.wrapper";
-import validateMiddleware from "../../middlewares/validation.middleware";
-import postSchema from "../../schemas/authentification/post.schema";
-import Limiter from "../../helpers/rateLimiter.config";
+import AuthController from "@/controllers/auth/auth.controller";
+import controllerWrapper from "@/helpers/controller.wrapper";
+import validateMiddleware from "@/middlewares/validation.middleware";
+import postSchema from "@/schemas/authentification/post.schema";
+import Limiter from "@/helpers/rateLimiter.config";
 
 const authRouter = Router();
 
 /**
- * POST /login
+ * POST /auth/login
  * @summary Login to the api
  * @tags Authentification
  * @param { LoginBody } request.body.required - Login info
@@ -26,7 +26,7 @@ authRouter.post(
 authRouter
   .route("/refresh_token")
   /**
-   * GET /refresh_token
+   * GET /auth/refresh_token
    * @summary To have a new access token
    * @tags Authentification
    * @return  { Tokens } 200 - Success response - application/json
@@ -37,7 +37,7 @@ authRouter
   .get(controllerWrapper(AuthController.refreshToken.bind(AuthController)))
 
   /**
-   * DELETE /refresh_token
+   * DELETE /auth/refresh_token
    * @summary To delete the refresh token
    * @tags Authentification
    * @return { Message } 200 - Success response - application/json

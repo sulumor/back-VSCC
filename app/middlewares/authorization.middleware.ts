@@ -1,21 +1,48 @@
+import { Request, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import ApiError from "../errors/api.error";
+import UsersDatamapper from "@/datamapper/users.datamapper";
+import { User } from "@/@Types/users.types";
 
-export default function authenticateToken(
-  req: { headers: { authorization: any }; user: any },
-  _: any,
-  next: (arg0: ApiError | undefined) => void
-) {
-  const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.split(" ")[1];
-  if (!token) next(new ApiError("Null token", { httpStatus: 401 }));
-  jwt.verify(
-    token,
-    process.env.ACCESS_TOKEN_SECRET,
-    (err: { message: string | undefined }, user: any) => {
-      if (err) next(new ApiError(err.message, { httpStatus: 403 }));
-      req.user = user;
-      next(undefined);
-    }
-  );
+interface RequestWithUser extends Request {
+  user?: string | jwt.JwtPayload;
 }
+
+function authenticateToken(req: RequestWithUser, _: any, next: NextFunction) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader)
+    return next(
+      new ApiError("Authentification nécessaire", { httpStatus: 401 })
+    );
+  const token = authHeader.split(" ")[1];
+
+  if (!token) return next(new ApiError("Token invalide", { httpStatus: 401 }));
+
+  if (!process.env.ACCESS_TOKEN_SECRET)
+    return next(new ApiError("Manque clef du token", { httpStatus: 500 }));
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, user) => {
+    if (err) next(new ApiError(err.message, { httpStatus: 403 }));
+    if (!user || typeof user === "string")
+      return next(
+        new ApiError("Authentification nécessaire", { httpStatus: 401 })
+      );
+    const userExits: User = await UsersDatamapper.findByPk(user.id);
+    if (!userExits)
+      return next(new ApiError("Accès interdit", { httpStatus: 403 }));
+    req.user = user;
+    next();
+  });
+}
+
+function isAdmin(req: RequestWithUser, _: any, next: NextFunction) {
+  if (!req.user || typeof req.user === "string")
+    return next(
+      new ApiError("Authentification nécessaire", { httpStatus: 401 })
+    );
+  if (!req.user.is_admin)
+    return next(new ApiError("Accès refusé", { httpStatus: 403 }));
+  return next();
+}
+
+export { authenticateToken, isAdmin };

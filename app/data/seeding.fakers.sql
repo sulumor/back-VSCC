@@ -3,11 +3,11 @@ BEGIN;
 TRUNCATE TABLE "user", "trace" RESTART IDENTITY CASCADE;
 
 INSERT INTO "user"(firstname, email, password, is_admin) VALUES 
-('Jared', 'tevbez@meramu.mk', 'n46jvtsq', false),
-('Essie', 'cifkurul@izawbus.cv', '7dj3fm1t', false),
-('Mario', 'di@puddiknun.uk', '4ffk53rx', true),
-('Etta', 'nawadi@ehve.bo', 'efmqx6x5', true),
-('Travis', 'jo@ocociec.jo', 'rkiobfi9', false);
+('Jared', 'tevbez@meramu.mk', '$2b$12$WfNSMH0Yob5/JbuS4t9zYeSz1sZCDVCLlxcLS7fyt1EpNbiqxNaNa', false),
+('Essie', 'cifkurul@izawbus.cv', '$2b$12$WfNSMH0Yob5/JbuS4t9zYeSz1sZCDVCLlxcLS7fyt1EpNbiqxNaNa', false),
+('Mario', 'di@puddiknun.uk', '$2b$12$WfNSMH0Yob5/JbuS4t9zYeSz1sZCDVCLlxcLS7fyt1EpNbiqxNaNa', true),
+('Etta', 'nawadi@ehve.bo', '$2b$12$WfNSMH0Yob5/JbuS4t9zYeSz1sZCDVCLlxcLS7fyt1EpNbiqxNaNa', true),
+('Travis', 'jo@ocociec.jo', '$2b$12$WfNSMH0Yob5/JbuS4t9zYeSz1sZCDVCLlxcLS7fyt1EpNbiqxNaNa', false);
 
 INSERT INTO "trace"(strava_id, strava_hash, start, finish, switch, is_a_loop, distance, elevation, description,image) VALUES
 ('3260656048129516876','8.1/49.041/1.929','Paris', 'Saint-Ouen-Sur-Seine', 'Cergy', true, 218, 2756, 'Trace CC vers Cergy modifié pour retourner à Saint Ouen sans passer par Cergy', 'src/assets/Screen 1.png' ),

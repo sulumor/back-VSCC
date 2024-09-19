@@ -5,6 +5,7 @@ import TracesController from "@/controllers/api/traces.controller";
 import validationMiddleware from "@/middlewares/validation.middleware";
 import tracesPostSchema from "@/schemas/api/traces/post.schema";
 import tracesPatchSchema from "@/schemas/api/traces/patch.schema";
+import { authenticateToken } from "@/middlewares/authorization.middleware";
 
 const tracesRouter = Router();
 
@@ -34,6 +35,7 @@ tracesRouter
    * @return { ApiJsonError } 500 - Réponse en cas de problème serveur - application/json
    */
   .patch(
+    authenticateToken,
     validationMiddleware("body", tracesPatchSchema),
     controllerWrapper(TracesController.update.bind(TracesController))
   )
@@ -48,7 +50,10 @@ tracesRouter
    * @return { ApiJsonError } 404 - Réponse en cas de réponse non trouvée - application/json
    * @return { ApiJsonError } 500 - Réponse en cas de problème serveur - application/json
    */
-  .delete(controllerWrapper(TracesController.delete.bind(TracesController)));
+  .delete(
+    authenticateToken,
+    controllerWrapper(TracesController.delete.bind(TracesController))
+  );
 
 tracesRouter
   .route("/")
@@ -74,6 +79,7 @@ tracesRouter
    * @return { ApiJsonError } 500 - Réponse en cas de problème serveur - application/json
    */
   .post(
+    authenticateToken,
     validationMiddleware("body", tracesPostSchema),
     controllerWrapper(TracesController.create.bind(TracesController))
   );

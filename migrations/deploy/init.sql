@@ -22,7 +22,7 @@ CREATE TABLE "user" (
   "id" uuid DEFAULT gen_random_uuid() UNIQUE PRIMARY KEY,
   "firstname" text NOT NULL,
   "password" text NOT NULL,
-  "email" text UNIQUE,
+  "email" text UNIQUE NOT NULL,
   "is_admin" boolean NOT NULL DEFAULT false,
   "created_at" timestamptz NOT NULL DEFAULT now(),
   "updated_at" timestamptz

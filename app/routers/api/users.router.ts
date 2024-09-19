@@ -5,8 +5,15 @@ import UsersController from "@/controllers/api/users.controller";
 import validationMiddleware from "@/middlewares/validation.middleware";
 import UsersPostSchema from "@/schemas/api/users/post.schema";
 import UsersPatchSchema from "@/schemas/api/users/patch.schema";
+import {
+  authenticateToken,
+  isAdmin,
+} from "@/middlewares/authorization.middleware";
 
 const usersRouter = Router();
+
+usersRouter.use(authenticateToken);
+usersRouter.use(isAdmin);
 
 usersRouter
   .route(

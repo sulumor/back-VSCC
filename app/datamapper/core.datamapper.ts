@@ -1,17 +1,19 @@
 import type { Traces, Trace } from "@/@Types/traces.types";
+import type { Users, User } from "@/@Types/users.types";
 import client from "../helpers/pg.client";
+import { QueryResult } from "pg";
 
 export default class CoreDatamapper {
   static tableName: string;
   static insertTable: string;
   static updateTable: string;
 
-  static async findAll(): Promise<Traces> {
+  static async findAll() {
     const result = await client.query(`SELECT * FROM "${this.tableName}"`);
     return result.rows;
   }
 
-  static async findByPk(id: string): Promise<Trace> {
+  static async findByPk(id: string) {
     const result = await client.query(
       `SELECT * FROM "${this.tableName}" WHERE id=$1`,
       [id]
@@ -19,7 +21,7 @@ export default class CoreDatamapper {
     return result.rows[0];
   }
 
-  static async findByParams(params: { where: any }): Promise<Traces> {
+  static async findByParams(params: { where: any }) {
     let filter = "";
     const values: unknown[] = [];
 
@@ -51,14 +53,14 @@ export default class CoreDatamapper {
     return result.rows;
   }
 
-  static async insert(data: Partial<Trace>): Promise<Trace> {
+  static async insert(data: Partial<Trace | User>) {
     const result = await client.query(`SELECT * FROM ${this.insertTable}($1)`, [
       data,
     ]);
     return result.rows[0];
   }
 
-  static async update(data: Partial<Trace>): Promise<Trace> {
+  static async update(data: Partial<Trace | User>) {
     const result = await client.query(`SELECT * FROM ${this.updateTable}($1)`, [
       data,
     ]);

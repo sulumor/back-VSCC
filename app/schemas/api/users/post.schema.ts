@@ -1,5 +1,5 @@
 import { passwordRegex } from "@/schemas/regex.schema";
-import Joi from "joi";
+import Joi, { required } from "joi";
 
 export default Joi.object({
   firstname: Joi.string().required().messages({
@@ -14,7 +14,8 @@ export default Joi.object({
     "string.pattern.base":
       "Le mot de passe doit contenir au moins 8 caractères dont 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial",
   }),
-  email: Joi.string().email({ minDomainSegments: 1 }).messages({
+  email: Joi.string().email({ minDomainSegments: 1 }).required().messages({
+    "any.required": "L'email est requis",
     "string.base": "L'email doit être au format d'une chaîne de caractères",
     "string.email": "L'email donné n'est pas au format valide",
   }),

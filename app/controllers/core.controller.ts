@@ -1,13 +1,14 @@
 import { Request, Response, NextFunction } from "express";
 import type { Trace, Traces } from "@/@Types/traces.types";
+import type { User, Users } from "@/@Types/users.types";
 import ApiError from "@/errors/api.error";
 
 export default class CoreController {
   static datamapper: {
-    findAll: () => Promise<Traces>;
-    findByPk: (id: string) => Promise<Trace>;
-    insert: (data: Partial<Trace>) => Promise<Trace>;
-    update: (data: Partial<Trace>) => Promise<Trace>;
+    findAll: () => Promise<Traces | Users>;
+    findByPk: (id: string) => Promise<Trace | User>;
+    insert: (data: Partial<Trace | User>) => Promise<Trace | User>;
+    update: (data: Partial<Trace | User>) => Promise<Trace | User>;
     delete: (id: string) => Promise<boolean>;
   };
 
