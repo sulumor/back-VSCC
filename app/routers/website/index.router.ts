@@ -1,7 +1,7 @@
 import { Router } from "express";
-import WebsiteError from "../../errors/website.error";
-import controllerWrapper from "../../helpers/controller.wrapper";
-import controller from "../../controllers/website/website.controller";
+import WebsiteError from "@/errors/website.error";
+import controllerWrapper from "@/helpers/controller.wrapper";
+import controller from "@/controllers/website/website.controller";
 
 const websiteRouter = Router();
 

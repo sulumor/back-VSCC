@@ -12,9 +12,7 @@ import logger from "../logger/index.logger.js";
 export default (err: any, _: any, res: any, __: any): Express.Response => {
   if (err.httpStatus === 500) logger.error(" Serveur erreur", err);
   if (err.format === "html") {
-    return res
-      .status(err.httpStatus)
-      .render(`erreur ${err.httpStatus}`, { error: err });
+    return res.status(err.httpStatus).render("error", { error: err });
   }
   return res.status(err.httpStatus).json({ error: err.message });
 };

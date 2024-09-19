@@ -59,4 +59,26 @@ export default class AuthController {
     res.clearCookie("refresh_token");
     return res.status(200).json({ message: "refresh token deleted" });
   }
+
+  static async register({ body }: Request, res: Response, next: NextFunction) {
+    const existsUser: Users = await UsersDatamapper.findByParams({
+      where: { email: body.email },
+    });
+
+    if (existsUser[0])
+      return next(new ApiError("Utilisateur existe déjà", { httpStatus: 400 }));
+
+    body.password = await bcrypt.hash(
+      body.password,
+      Number.parseInt(process.env.BCRYPT_SALT as string, 10)
+    );
+
+    const user: User = await UsersDatamapper.insert(body);
+
+    const token = createJWT(user);
+
+    res.cookie("refresh_token", token.refreshToken, { httpOnly: true });
+
+    return res.status(200).json(token);
+  }
 }

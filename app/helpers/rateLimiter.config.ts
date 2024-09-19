@@ -8,7 +8,8 @@ const Limiter = {
   accountLogin: rateLimit({
     windowMs: 60 * 1000,
     limit: 5,
-    message: "You have exceeded the 5 account login attempts per minute limit !",
+    message:
+      "Vous avez dépassé la limite de 5 tentatives de connexion par minute !",
   }),
 };
 

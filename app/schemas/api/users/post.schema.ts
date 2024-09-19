@@ -1,5 +1,5 @@
 import { passwordRegex } from "@/schemas/regex.schema";
-import Joi, { required } from "joi";
+import Joi from "joi";
 
 export default Joi.object({
   firstname: Joi.string().required().messages({
