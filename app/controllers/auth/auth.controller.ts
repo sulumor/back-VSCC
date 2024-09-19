@@ -1,11 +1,11 @@
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import ApiError from "@/errors/api.error.js";
-import { createAccessToken, createRefreshToken } from "@/helpers/jwt.function";
+import { createAccessToken } from "@/helpers/jwt.function";
 import UsersDatamapper from "@/datamapper/users.datamapper";
 import type { Users, User } from "@/@Types/users.types";
 import { Request, Response, NextFunction } from "express";
 import createRefreshTokenCookies from "@/helpers/cookies.function";
+import { comparePassword, hashPassword } from "@/helpers/bcrypt.function";
 
 export default class AuthController {
   static async login(
@@ -13,7 +13,7 @@ export default class AuthController {
     res: Response,
     next: NextFunction
   ): Promise<Response | void> {
-    const errorMessage = "Échec de l'authentification";
+    const errorMessage = "Échec lors de l'authentification";
     const errorInfos = { httpStatus: 401 };
 
     const user: Users = await UsersDatamapper.findByParams({
@@ -22,12 +22,8 @@ export default class AuthController {
 
     if (!user[0]) return next(new ApiError(errorMessage, errorInfos));
 
-    const isPasswordCorrect = await bcrypt.compare(
-      body.password,
-      user[0].password
-    );
-
-    if (!isPasswordCorrect) return next(new ApiError(errorMessage, errorInfos));
+    if (!comparePassword(body.password, user[0].password))
+      return next(new ApiError(errorMessage, errorInfos));
 
     createRefreshTokenCookies(res, user[0]);
 
@@ -59,7 +55,7 @@ export default class AuthController {
 
   static deleteToken(_: any, res: Response) {
     res.clearCookie("refresh_token");
-    return res.status(200).json({ message: "refresh token deleted" });
+    return res.status(200).json({ message: "Le refresh token bien supprimé" });
   }
 
   static async register({ body }: Request, res: Response, next: NextFunction) {
@@ -70,10 +66,7 @@ export default class AuthController {
     if (existsUser[0])
       return next(new ApiError("Utilisateur existe déjà", { httpStatus: 400 }));
 
-    body.password = await bcrypt.hash(
-      body.password,
-      Number.parseInt(process.env.BCRYPT_SALT as string, 10)
-    );
+    body.password = hashPassword(body.password);
 
     const user: User = await UsersDatamapper.insert(body);
 
