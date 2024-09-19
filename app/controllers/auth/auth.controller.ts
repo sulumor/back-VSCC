@@ -1,10 +1,11 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import ApiError from "@/errors/api.error.js";
-import createJWT from "@/helpers/jwt.function";
+import { createAccessToken, createRefreshToken } from "@/helpers/jwt.function";
 import UsersDatamapper from "@/datamapper/users.datamapper";
 import type { Users, User } from "@/@Types/users.types";
 import { Request, Response, NextFunction } from "express";
+import createRefreshTokenCookies from "@/helpers/cookies.function";
 
 export default class AuthController {
   static async login(
@@ -28,16 +29,18 @@ export default class AuthController {
 
     if (!isPasswordCorrect) return next(new ApiError(errorMessage, errorInfos));
 
-    const token = createJWT(user[0]);
+    createRefreshTokenCookies(res, user[0]);
 
-    res.cookie("refresh_token", token.refreshToken, { httpOnly: true });
-
-    return res.status(200).json(token);
+    return res.status(200).json({ accessToken: createAccessToken(user[0]) });
   }
 
   // eslint-disable-next-line consistent-return
-  static refreshToken({ cookies }: Request, res: Response, next: NextFunction) {
-    const refreshToken: string = cookies.refresh_token;
+  static refreshToken(
+    { signedCookies }: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const refreshToken: string = signedCookies.refresh_token;
 
     if (!refreshToken)
       return next(new ApiError("Refresh token est null", { httpStatus: 401 }));
@@ -47,11 +50,10 @@ export default class AuthController {
 
     jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
       if (err) next(new ApiError(err.message, { httpStatus: 403 }));
-      const token = createJWT(user as User);
-      // { httpOnly: true, sameSite: "none", secure: true }
-      res.cookie("refresh_token", token.refreshToken, { httpOnly: true });
 
-      return res.status(200).json(token);
+      return res
+        .status(200)
+        .json({ accessToken: createAccessToken(user as User) });
     });
   }
 
@@ -75,10 +77,8 @@ export default class AuthController {
 
     const user: User = await UsersDatamapper.insert(body);
 
-    const token = createJWT(user);
+    createRefreshTokenCookies(res, user);
 
-    res.cookie("refresh_token", token.refreshToken, { httpOnly: true });
-
-    return res.status(200).json(token);
+    return res.status(200).json({ accessToken: createAccessToken(user) });
   }
 }

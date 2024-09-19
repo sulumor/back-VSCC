@@ -35,7 +35,10 @@ authRouter
    * @return { ApiJsonError } 403 - Réponse en cas d'accès interdit - application/json
    * @return { ApiJsonError } 500 - Réponse en cas de problème serveur - application/json
    */
-  .get(controllerWrapper(AuthController.refreshToken.bind(AuthController)))
+  .get(
+    Limiter.refreshToken,
+    controllerWrapper(AuthController.refreshToken.bind(AuthController))
+  )
 
   /**
    * DELETE /auth/refresh_token
@@ -57,6 +60,7 @@ authRouter
  */
 authRouter.post(
   "/register",
+  Limiter.accountLogin,
   validateMiddleware("body", UserPostSchema),
   controllerWrapper(AuthController.register.bind(AuthController))
 );

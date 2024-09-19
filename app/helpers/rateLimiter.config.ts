@@ -8,8 +8,12 @@ const Limiter = {
   accountLogin: rateLimit({
     windowMs: 60 * 1000,
     limit: 5,
-    message:
-      "Vous avez dépassé la limite de 5 tentatives de connexion par minute !",
+    message: "Vous avez dépassé la limite de tentatives de connexion !",
+  }),
+  refreshToken: rateLimit({
+    windowMs: 60 * 1000,
+    limit: 10,
+    message: "Vous avez dépassé la limite de tentatives de connexion !",
   }),
 };
 
