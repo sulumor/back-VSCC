@@ -19,6 +19,11 @@
  * @property { string } password - Mot de passe
  */
 
+/**
+ * @typedef { object } EmailBody
+ * @property { string } email - Email
+ */
+
 // TRACES
 
 /**

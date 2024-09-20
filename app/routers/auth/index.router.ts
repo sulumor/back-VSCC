@@ -1,12 +1,36 @@
 import { Router } from "express";
-import AuthController from "@/controllers/auth/auth.controller";
+// ----- HELPER -----
+import Limiter from "@/helpers/rateLimiter.config";
 import controllerWrapper from "@/helpers/controller.wrapper";
 import validateMiddleware from "@/middlewares/validation.middleware";
+// ----- CONTROLLER -----
+import AuthController from "@/controllers/auth/auth.controller";
+// ----- SCHEMA -----
 import UserPostSchema from "@/schemas/api/users/post.schema";
 import postSchema from "@/schemas/authentification/post.schema";
-import Limiter from "@/helpers/rateLimiter.config";
+import emailSchema from "@/schemas/authentification/email.schema";
 
 const authRouter = Router();
+
+//! FAIRE SCHEMA LE FORGOT PASSWORD
+
+/**
+ * POST /auth/forgot_password
+ * @summary Recevoir un email pour modifier son mot de passe
+ * @tags Authentification
+ * @param { EmailBody } request.body.required - Email pour l'envoi du formulaire de modification de mot de passe
+ * @return  { } 204 - Réponse en cas de succès - application/json
+ * @return { ApiJsonError } 404 - Réponse en cas de réponse non trouvée - application/json
+ * @return { ApiJsonError } 409 - Réponse en cas de demande déjà effectuer - application/json
+ * @return { ApiJsonError } 500 - Réponse en cas de problème serveur - application/json
+ * @return { ApiJsonError } 503 - Réponse en cas de non envoie de l'email - application/json
+ */
+authRouter.post(
+  "/forgot_password",
+  Limiter.accountLogin,
+  validateMiddleware("body", emailSchema),
+  controllerWrapper(AuthController.forgotPassword.bind(AuthController))
+);
 
 /**
  * POST /auth/login

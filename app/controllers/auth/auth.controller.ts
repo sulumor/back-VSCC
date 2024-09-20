@@ -1,13 +1,66 @@
 import jwt from "jsonwebtoken";
 import ApiError from "@/errors/api.error.js";
-import { createAccessToken } from "@/helpers/jwt.function";
+import { createId } from "@paralleldrive/cuid2";
 import UsersDatamapper from "@/datamapper/users.datamapper";
-import type { Users, User } from "@/@Types/users.types";
-import { Request, Response, NextFunction } from "express";
+// ----- HELPERS -----
+import { createAccessToken } from "@/helpers/jwt.function";
 import createRefreshTokenCookies from "@/helpers/cookies.function";
 import { comparePassword, hashPassword } from "@/helpers/bcrypt.function";
+import resetPasswordEmail from "@/helpers/nodemailer.function";
+// ----- TYPES -----
+import type { Users, User } from "@/@Types/users.types";
+import { Request, Response, NextFunction } from "express";
 
 export default class AuthController {
+  static async forgotPassword(
+    { body }: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const { email } = body;
+    const existsUser: Users = await UsersDatamapper.findByParams({
+      where: { email },
+    });
+    if (!existsUser[0])
+      return next(
+        new ApiError(
+          "Nous ne vous trouvons pas, notifier l'email avec lequel vous vous êtes enregistré(e)",
+          { httpStatus: 404 }
+        )
+      );
+    if (existsUser[0].is_resetting_password)
+      return next(
+        new ApiError(
+          "Une demande de réinitialisation de mot de passe est déjà en cours.",
+          { httpStatus: 409 }
+        )
+      );
+    const resetToken = createId();
+
+    const responseEmail = await resetPasswordEmail({
+      email,
+      id: existsUser[0].id,
+      token: resetToken,
+    });
+
+    if (!responseEmail) {
+      return next(
+        new ApiError(
+          "Problème lors de l'envoi de l'email. Veuillez réessayer plus tard",
+          { httpStatus: 503 }
+        )
+      );
+    }
+
+    await UsersDatamapper.update({
+      id: existsUser[0].id,
+      is_resetting_password: true,
+      reset_password_token: resetToken,
+    });
+
+    return res.status(204).end();
+  }
+
   static async login(
     { body }: Request,
     res: Response,

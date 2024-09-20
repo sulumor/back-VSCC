@@ -24,6 +24,8 @@ CREATE TABLE "user" (
   "password" text NOT NULL,
   "email" text UNIQUE NOT NULL,
   "is_admin" boolean NOT NULL DEFAULT false,
+  "is_resetting_password" boolean NOT NULL DEFAULT false,
+  "reset_password_token" text DEFAULT null,
   "created_at" timestamptz NOT NULL DEFAULT now(),
   "updated_at" timestamptz
 );
