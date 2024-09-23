@@ -38,8 +38,7 @@ export default class AuthController {
     const resetToken = createId();
 
     const responseEmail = await resetPasswordEmail({
-      email,
-      id: existsUser.id,
+      user: existsUser,
       token: resetToken,
     });
 
