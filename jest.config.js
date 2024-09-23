@@ -13,5 +13,7 @@ export default {
   moduleNameMapper: {
     "^(\\.{1,2}/.*)\\.js$": "$1",
   },
-  preset: "ts-jest/presets/default-esm",
+  preset: "ts-jest",
+  testEnvironment: "node",
+  testMatch: ["**/*.spec.ts", "**/*.test.ts"],
 };
