@@ -1,17 +1,21 @@
-import jwt from "jsonwebtoken";
 import ApiError from "@/errors/api.error.js";
 import { createId } from "@paralleldrive/cuid2";
 import UsersDatamapper from "@/datamapper/users.datamapper";
-// ----- HELPERS -----
-import { createAccessToken } from "@/helpers/jwt.function";
-import createRefreshTokenCookies from "@/helpers/cookies.function";
-import { comparePassword, hashPassword } from "@/helpers/bcrypt.function";
-import resetPasswordEmail from "@/helpers/nodemailer.function";
 // ----- TYPES -----
 import type { Users, User } from "@/@Types/users.types";
 import { Request, Response, NextFunction } from "express";
+// ----- SERVICES -----
+import MailerService from "@/services/mailer.service";
+import BcryptService from "@/services/bcrypt.service";
+import CookiesService from "@/services/cookies.service";
+import JWTService from "@/services/jwt.service";
 
 export default class AuthController {
+  private static mailerService: MailerService = new MailerService();
+  private static bcryptService: BcryptService = new BcryptService();
+  private static cookiesService: CookiesService = new CookiesService();
+  private static jwtService: JWTService = new JWTService();
+
   static async forgotPassword(
     { body }: Request,
     res: Response,
@@ -28,6 +32,7 @@ export default class AuthController {
           { httpStatus: 404 }
         )
       );
+
     if (existsUser.is_resetting_password)
       return next(
         new ApiError(
@@ -37,19 +42,18 @@ export default class AuthController {
       );
     const resetToken = createId();
 
-    const responseEmail = await resetPasswordEmail({
+    const responseEmail: boolean = await this.mailerService.resetPasswordEmail({
       user: existsUser,
       token: resetToken,
     });
 
-    if (!responseEmail) {
+    if (!responseEmail)
       return next(
         new ApiError(
           "Problème lors de l'envoi de l'email. Veuillez réessayer plus tard",
           { httpStatus: 503 }
         )
       );
-    }
 
     await UsersDatamapper.update({
       id: existsUser.id,
@@ -84,7 +88,7 @@ export default class AuthController {
 
     await UsersDatamapper.update({
       id: findingUser.id,
-      password: hashPassword(password),
+      password: this.bcryptService.hashPassword(password),
       is_resetting_password: false,
       reset_password_token: null,
     });
@@ -106,35 +110,30 @@ export default class AuthController {
 
     if (!user) return next(new ApiError(errorMessage, errorInfos));
 
-    if (!comparePassword(body.password, user.password))
+    if (!this.bcryptService.comparePassword(body.password, user.password))
       return next(new ApiError(errorMessage, errorInfos));
 
-    createRefreshTokenCookies(res, user);
+    this.cookiesService.createRefreshTokenCookies(res, user);
 
-    return res.status(200).json({ accessToken: createAccessToken(user) });
+    return res
+      .status(200)
+      .json({ accessToken: this.jwtService.createAccessToken(user) });
   }
 
-  // eslint-disable-next-line consistent-return
   static refreshToken(
     { signedCookies }: Request,
     res: Response,
     next: NextFunction
   ) {
     const refreshToken: string = signedCookies.refresh_token;
-
     if (!refreshToken)
-      return next(new ApiError("Refresh token est null", { httpStatus: 401 }));
-
-    if (!process.env.REFRESH_TOKEN_SECRET)
-      return next(new ApiError("Manque clef du token", { httpStatus: 500 }));
-
-    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-      if (err) next(new ApiError(err.message, { httpStatus: 403 }));
-
-      return res
-        .status(200)
-        .json({ accessToken: createAccessToken(user as User) });
-    });
+      return next(
+        new ApiError(
+          "Veuillez vous connecter pour poursuivre la visite de notre site",
+          { httpStatus: 404 }
+        )
+      );
+    this.jwtService.haveNewAccessToken(refreshToken, res, next);
   }
 
   static deleteToken(_: any, res: Response) {
@@ -150,12 +149,14 @@ export default class AuthController {
     if (existsUser)
       return next(new ApiError("Utilisateur existe déjà", { httpStatus: 400 }));
 
-    body.password = hashPassword(body.password);
+    body.password = this.bcryptService.hashPassword(body.password);
 
     const user: User = await UsersDatamapper.insert(body);
 
-    createRefreshTokenCookies(res, user);
+    this.cookiesService.createRefreshTokenCookies(res, user);
 
-    return res.status(200).json({ accessToken: createAccessToken(user) });
+    return res
+      .status(200)
+      .json({ accessToken: this.jwtService.createAccessToken(user) });
   }
 }

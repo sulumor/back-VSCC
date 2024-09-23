@@ -1,4 +1,5 @@
 import { Router } from "express";
+import cookieParser from "cookie-parser";
 // ----- HELPERS -----
 import Limiter from "@/helpers/rateLimiter.config";
 import controllerWrapper from "@/helpers/controller.wrapper";
@@ -12,6 +13,8 @@ import emailSchema from "@/schemas/authentification/email.schema";
 import resetPasswordSchema from "@/schemas/authentification/resetPassword.schema";
 
 const authRouter = Router();
+
+authRouter.use(cookieParser(process.env.COOKIE_PARSER_SECRET));
 
 /**
  * POST /auth/forgot_password

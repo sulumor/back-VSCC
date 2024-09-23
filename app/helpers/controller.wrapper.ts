@@ -1,7 +1,10 @@
 import ApiError from "../errors/api.error";
+import { Request, Response, NextFunction } from "express";
 
-export default (controllerMdw: (arg0: any, arg1: any, arg2: any) => any) =>
-  async (req: any, res: any, next: (arg0: any) => void) => {
+export default (
+    controllerMdw: (req: Request, res: Response, next: NextFunction) => any
+  ) =>
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
       await controllerMdw(req, res, next);
     } catch (err: any) {

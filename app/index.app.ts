@@ -7,7 +7,6 @@ import corsOptions from "./helpers/cors.options";
 import Limiter from "./helpers/rateLimiter.config";
 import router from "./routers/index.router";
 import errorMiddleware from "./middlewares/error.middleware";
-import cookieParser from "cookie-parser";
 
 const app = express();
 
@@ -28,7 +27,6 @@ createDoc(app);
 app.use(cors(corsOptions));
 app.use(helmet());
 app.use(express.json());
-app.use(cookieParser(process.env.COOKIE_PARSER_SECRET));
 app.use(Limiter.base);
 app.use(router);
 app.use(errorMiddleware);
