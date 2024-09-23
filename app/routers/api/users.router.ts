@@ -1,14 +1,16 @@
 import { Router } from "express";
-import controllerWrapper from "@/helpers/controller.wrapper";
 import ApiError from "@/errors/api.error";
 import UsersController from "@/controllers/api/users.controller";
+// ----- HELPERS -----
 import validationMiddleware from "@/middlewares/validation.middleware";
-import UsersPostSchema from "@/schemas/api/users/post.schema";
-import UsersPatchSchema from "@/schemas/api/users/patch.schema";
 import {
   authenticateToken,
   isAdmin,
 } from "@/middlewares/authorization.middleware";
+import controllerWrapper from "@/helpers/controller.wrapper";
+// ----- SCHEMAS
+import UsersPatchSchema from "@/schemas/api/users/patch.schema";
+import UsersPostSchema from "@/schemas/api/users/post.schema";
 
 const usersRouter = Router();
 

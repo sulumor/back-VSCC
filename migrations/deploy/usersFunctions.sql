@@ -25,7 +25,8 @@ CREATE FUNCTION "update_user"(json) RETURNS "user" AS $$
     "password" = COALESCE(($1->>'password'), "password"),
     "is_admin" = COALESCE(($1->>'is_admin')::boolean, "is_admin"),
     "is_resetting_password" = COALESCE(($1->>'is_resetting_password')::boolean, "is_resetting_password"),
-    "reset_password_token" = COALESCE(($1->>'reset_password_token'), "reset_password_token")
+    "reset_password_token" = COALESCE(($1->>'reset_password_token'), "reset_password_token"),
+    "updated_at" = now()
   WHERE "id"= (($1->>'id')::uuid);
 
   SELECT * FROM "user" WHERE "id" = ($1->>'id')::uuid; 

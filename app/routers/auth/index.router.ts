@@ -1,18 +1,17 @@
 import { Router } from "express";
-// ----- HELPER -----
+// ----- HELPERS -----
 import Limiter from "@/helpers/rateLimiter.config";
 import controllerWrapper from "@/helpers/controller.wrapper";
 import validateMiddleware from "@/middlewares/validation.middleware";
-// ----- CONTROLLER -----
+// ----- CONTROLLERS -----
 import AuthController from "@/controllers/auth/auth.controller";
-// ----- SCHEMA -----
+// ----- SCHEMAS -----
 import UserPostSchema from "@/schemas/api/users/post.schema";
 import postSchema from "@/schemas/authentification/post.schema";
 import emailSchema from "@/schemas/authentification/email.schema";
+import resetPasswordSchema from "@/schemas/authentification/resetPassword.schema";
 
 const authRouter = Router();
-
-//! FAIRE SCHEMA LE FORGOT PASSWORD
 
 /**
  * POST /auth/forgot_password
@@ -30,6 +29,22 @@ authRouter.post(
   Limiter.accountLogin,
   validateMiddleware("body", emailSchema),
   controllerWrapper(AuthController.forgotPassword.bind(AuthController))
+);
+
+/**
+ * POST /auth/reset_password
+ * @summary Modification de son mot de passe
+ * @tags Authentification
+ * @param { ResetPasswordBody } request.body.required - Information pour modifier le mot de passe
+ * @return  { } 204 - Réponse en cas de succès - application/json
+ * @return { ApiJsonError } 404 - Réponse en cas de réponse non trouvée - application/json
+ * @return { ApiJsonError } 500 - Réponse en cas de problème serveur - application/json
+ */
+authRouter.post(
+  "/reset_password",
+  Limiter.accountLogin,
+  validateMiddleware("body", resetPasswordSchema),
+  controllerWrapper(AuthController.resetUserPassword.bind(AuthController))
 );
 
 /**

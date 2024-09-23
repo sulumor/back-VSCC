@@ -1,7 +1,6 @@
-import type { Traces, Trace } from "@/@Types/traces.types";
-import type { Users, User } from "@/@Types/users.types";
+import type { Trace } from "@/@Types/traces.types";
+import type { User } from "@/@Types/users.types";
 import client from "../helpers/pg.client";
-import { QueryResult } from "pg";
 
 export default class CoreDatamapper {
   static tableName: string;

@@ -12,6 +12,7 @@
     "skipDefaultLibCheck": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "noUnusedLocals": true,
     "outDir": "./dist",
     "strictPropertyInitialization": false,
     "paths": {

@@ -32,7 +32,8 @@ CREATE FUNCTION "update_trace"(json) RETURNS "trace" AS $$
     "distance" = COALESCE(($1->>'distance')::int,"distance"),
     "elevation" = COALESCE(($1->>'elevation')::int,"elevation"),
     "description" = COALESCE($1->>'description', "description"),
-    "image" = COALESCE(($1->>'image'), "image")
+    "image" = COALESCE(($1->>'image'), "image"),
+    "updated_at" = now()
   WHERE "id" = (($1->>'id')::int);
 
   SELECT * FROM "trace" WHERE "id" = ($1->>'id')::int;

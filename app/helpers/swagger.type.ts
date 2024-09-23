@@ -24,6 +24,13 @@
  * @property { string } email - Email
  */
 
+/**
+ * @typedef { object } ResetPasswordBody
+ * @property { string } id
+ * @property { string } token
+ * @property { string } password
+ */
+
 // TRACES
 
 /**

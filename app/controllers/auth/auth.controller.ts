@@ -18,17 +18,17 @@ export default class AuthController {
     next: NextFunction
   ) {
     const { email } = body;
-    const existsUser: Users = await UsersDatamapper.findByParams({
+    const [existsUser]: Users = await UsersDatamapper.findByParams({
       where: { email },
     });
-    if (!existsUser[0])
+    if (!existsUser)
       return next(
         new ApiError(
           "Nous ne vous trouvons pas, notifier l'email avec lequel vous vous êtes enregistré(e)",
           { httpStatus: 404 }
         )
       );
-    if (existsUser[0].is_resetting_password)
+    if (existsUser.is_resetting_password)
       return next(
         new ApiError(
           "Une demande de réinitialisation de mot de passe est déjà en cours.",
@@ -39,7 +39,7 @@ export default class AuthController {
 
     const responseEmail = await resetPasswordEmail({
       email,
-      id: existsUser[0].id,
+      id: existsUser.id,
       token: resetToken,
     });
 
@@ -53,9 +53,41 @@ export default class AuthController {
     }
 
     await UsersDatamapper.update({
-      id: existsUser[0].id,
+      id: existsUser.id,
       is_resetting_password: true,
       reset_password_token: resetToken,
+    });
+
+    return res.status(204).end();
+  }
+
+  static async resetUserPassword(
+    { body }: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const { password, token, id } = body;
+    const findingUser: User = await UsersDatamapper.findByPk(id);
+    if (!findingUser)
+      return next(
+        new ApiError("Aucun utilisateur de trouvé", { httpStatus: 404 })
+      );
+
+    if (
+      !findingUser.is_resetting_password ||
+      findingUser.reset_password_token !== token
+    )
+      return next(
+        new ApiError("Aucune demande de réinitialisation est en cours", {
+          httpStatus: 404,
+        })
+      );
+
+    await UsersDatamapper.update({
+      id: findingUser.id,
+      password: hashPassword(password),
+      is_resetting_password: false,
+      reset_password_token: null,
     });
 
     return res.status(204).end();
@@ -69,18 +101,18 @@ export default class AuthController {
     const errorMessage = "Échec lors de l'authentification";
     const errorInfos = { httpStatus: 401 };
 
-    const user: Users = await UsersDatamapper.findByParams({
+    const [user]: Users = await UsersDatamapper.findByParams({
       where: { email: body.email },
     });
 
-    if (!user[0]) return next(new ApiError(errorMessage, errorInfos));
+    if (!user) return next(new ApiError(errorMessage, errorInfos));
 
-    if (!comparePassword(body.password, user[0].password))
+    if (!comparePassword(body.password, user.password))
       return next(new ApiError(errorMessage, errorInfos));
 
-    createRefreshTokenCookies(res, user[0]);
+    createRefreshTokenCookies(res, user);
 
-    return res.status(200).json({ accessToken: createAccessToken(user[0]) });
+    return res.status(200).json({ accessToken: createAccessToken(user) });
   }
 
   // eslint-disable-next-line consistent-return
@@ -112,11 +144,11 @@ export default class AuthController {
   }
 
   static async register({ body }: Request, res: Response, next: NextFunction) {
-    const existsUser: Users = await UsersDatamapper.findByParams({
+    const [existsUser]: Users = await UsersDatamapper.findByParams({
       where: { email: body.email },
     });
 
-    if (existsUser[0])
+    if (existsUser)
       return next(new ApiError("Utilisateur existe déjà", { httpStatus: 400 }));
 
     body.password = hashPassword(body.password);

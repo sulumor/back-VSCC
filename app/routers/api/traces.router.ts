@@ -1,11 +1,13 @@
 import { Router } from "express";
-import controllerWrapper from "@/helpers/controller.wrapper";
 import ApiError from "@/errors/api.error";
 import TracesController from "@/controllers/api/traces.controller";
+// ----- HELPERS -----
+import controllerWrapper from "@/helpers/controller.wrapper";
 import validationMiddleware from "@/middlewares/validation.middleware";
+import { authenticateToken } from "@/middlewares/authorization.middleware";
+// ----- SCHEMAS -----
 import tracesPostSchema from "@/schemas/api/traces/post.schema";
 import tracesPatchSchema from "@/schemas/api/traces/patch.schema";
-import { authenticateToken } from "@/middlewares/authorization.middleware";
 
 const tracesRouter = Router();
 

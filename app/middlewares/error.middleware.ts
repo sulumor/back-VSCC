@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import logger from "../logger/index.logger.js";
 
 /**
