@@ -11,6 +11,7 @@ import UserPostSchema from "@/schemas/api/users/post.schema";
 import postSchema from "@/schemas/authentification/post.schema";
 import emailSchema from "@/schemas/authentification/email.schema";
 import resetPasswordSchema from "@/schemas/authentification/resetPassword.schema";
+import ApiError from "@/errors/api.error";
 
 const authRouter = Router();
 
@@ -105,6 +106,10 @@ authRouter.post(
   Limiter.accountLogin,
   validateMiddleware("body", UserPostSchema),
   controllerWrapper(AuthController.register.bind(AuthController))
+);
+
+authRouter.use((_, __, next) =>
+  next(new ApiError("Ressources non trouvées", { httpStatus: 404 }))
 );
 
 export default authRouter;

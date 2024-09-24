@@ -2,6 +2,7 @@ import { stravaHashRegex, stravaIdRegex } from "@/schemas/regex.schema";
 import Joi from "joi";
 
 export default Joi.object({
+  id: Joi.number(),
   strava_id: Joi.string().pattern(stravaIdRegex),
   strava_hash: Joi.string().pattern(stravaHashRegex),
   start: Joi.string(),

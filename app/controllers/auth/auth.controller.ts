@@ -17,7 +17,7 @@ export default class AuthController {
   private static jwtService: JWTService = new JWTService();
 
   static async forgotPassword(
-    { body }: Request,
+    { body }: Partial<Request>,
     res: Response,
     next: NextFunction
   ) {
@@ -65,7 +65,7 @@ export default class AuthController {
   }
 
   static async resetUserPassword(
-    { body }: Request,
+    { body }: Partial<Request>,
     res: Response,
     next: NextFunction
   ) {
@@ -97,7 +97,7 @@ export default class AuthController {
   }
 
   static async login(
-    { body }: Request,
+    { body }: Partial<Request>,
     res: Response,
     next: NextFunction
   ): Promise<Response | void> {
@@ -121,19 +121,19 @@ export default class AuthController {
   }
 
   static refreshToken(
-    { signedCookies }: Request,
+    { signedCookies }: Partial<Request>,
     res: Response,
     next: NextFunction
   ) {
-    const refreshToken: string = signedCookies.refresh_token;
-    if (!refreshToken)
+    if (!signedCookies || !signedCookies.refresh_token)
       return next(
         new ApiError(
           "Veuillez vous connecter pour poursuivre la visite de notre site",
           { httpStatus: 404 }
         )
       );
-    this.jwtService.haveNewAccessToken(refreshToken, res, next);
+
+    this.jwtService.haveNewAccessToken(signedCookies.refresh_token, res, next);
   }
 
   static deleteToken(_: any, res: Response) {
@@ -141,7 +141,11 @@ export default class AuthController {
     return res.status(200).json({ message: "Le refresh token bien supprimé" });
   }
 
-  static async register({ body }: Request, res: Response, next: NextFunction) {
+  static async register(
+    { body }: Partial<Request>,
+    res: Response,
+    next: NextFunction
+  ) {
     const [existsUser]: Users = await UsersDatamapper.findByParams({
       where: { email: body.email },
     });
