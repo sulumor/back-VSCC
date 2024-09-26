@@ -12,6 +12,7 @@ import postSchema from "@/schemas/authentification/post.schema";
 import emailSchema from "@/schemas/authentification/email.schema";
 import resetPasswordSchema from "@/schemas/authentification/resetPassword.schema";
 import ApiError from "@/errors/api.error";
+import { authenticateTokenWithoutExp } from "@/middlewares/authorization.middleware";
 
 const authRouter = Router();
 
@@ -65,6 +66,21 @@ authRouter.post(
   Limiter.accountLogin,
   validateMiddleware("body", postSchema),
   controllerWrapper(AuthController.login.bind(AuthController))
+);
+
+/**
+ * GET /auth/user
+ * @summary Récupérer un nouvel access token via un token
+ * @tags Authentification
+ * @return  { Tokens } 200 - Réponse en cas de succès - application/json
+ * @return { ApiJsonError } 401 - Réponse en cas d'échec de l'authentification - application/json
+ * @return { ApiJsonError } 500 - Réponse en cas de problème serveur - application/json
+ */
+authRouter.get(
+  "/user",
+  Limiter.accountLogin,
+  authenticateTokenWithoutExp,
+  controllerWrapper(AuthController.getUserFromToken.bind(AuthController))
 );
 
 authRouter

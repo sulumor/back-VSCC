@@ -16,7 +16,6 @@ describe("JWTService", () => {
     mockUser = {
       id: 1,
       firstname: "John",
-      email: "john@example.com",
       is_admin: true,
     };
   });
@@ -32,7 +31,6 @@ describe("JWTService", () => {
         {
           id: mockUser.id,
           firstname: mockUser.firstname,
-          email: mockUser.email,
           is_admin: mockUser.is_admin,
         },
         expect.any(String),
@@ -78,7 +76,6 @@ describe("JWTService", () => {
       const user = {
         id: 1,
         firstname: "John",
-        email: "john@example.com",
         is_admin: true,
       };
 

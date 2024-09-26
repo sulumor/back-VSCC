@@ -15,13 +15,9 @@ export default class JWTService {
   }
 
   createAccessToken({ id, firstname, email, is_admin }: User) {
-    return jwt.sign(
-      { id, firstname, email, is_admin },
-      this.accessSecretToken,
-      {
-        expiresIn: 20,
-      }
-    );
+    return jwt.sign({ id, firstname, is_admin }, this.accessSecretToken, {
+      expiresIn: 20,
+    });
   }
 
   createRefreshToken({ id }: User) {

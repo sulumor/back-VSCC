@@ -11,7 +11,6 @@ export default Joi.object({
     "any.required": "Le mot de passe est requis",
     "string.base":
       "Le mot de passe doit être au format d'une chaîne de caratères",
-    "string.pattern.base":
-      "Le mot de passe doit contenir au moins 8 caractères dont 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial",
+    "string.pattern.base": "Échec lors de l'authentification",
   }),
 }).required();

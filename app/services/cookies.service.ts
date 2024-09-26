@@ -14,6 +14,8 @@ export default class CookiesService {
     res.cookie("refresh_token", this.jwtService.createRefreshToken(datas), {
       httpOnly: true,
       signed: true,
+      sameSite: "none",
+      secure: true,
     });
   }
 }

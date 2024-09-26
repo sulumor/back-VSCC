@@ -3,6 +3,7 @@ import { createId } from "@paralleldrive/cuid2";
 import UsersDatamapper from "@/datamapper/users.datamapper";
 // ----- TYPES -----
 import type { Users, User } from "@/@Types/users.types";
+import type { RequestWithUser } from "@/middlewares/authorization.middleware";
 import { Request, Response, NextFunction } from "express";
 // ----- SERVICES -----
 import MailerService from "@/services/mailer.service";
@@ -162,5 +163,12 @@ export default class AuthController {
     return res
       .status(200)
       .json({ accessToken: this.jwtService.createAccessToken(user) });
+  }
+
+  static getUserFromToken({ user }: RequestWithUser, res: Response) {
+    this.cookiesService.createRefreshTokenCookies(res, user as User);
+    return res
+      .status(200)
+      .json({ accessToken: this.jwtService.createAccessToken(user as User) });
   }
 }
