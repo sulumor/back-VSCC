@@ -49,7 +49,7 @@ export default class MailerService {
   private resetPasswordText: (user: userWithToken) => string = (user) =>
     `Bonjour ${user.firstname},
 
-  Vous venez d'effectuer une demande de réinitialisation de votre mot de passe. Veuillez cliquer sur ce lien afin de poursuivre votre démarche : ${process.env.ORIGIN}/reset-password/${user.id}/${user.token}.
+  Vous venez d'effectuer une demande de réinitialisation de votre mot de passe. Veuillez cliquer sur ce lien afin de poursuivre votre démarche : ${process.env.FRONT_URL}/reset-password/${user.id}/${user.token}.
 
   Si vous n'êtes pas l'auteur de cette demande, merci d'ignorer cette email.
     

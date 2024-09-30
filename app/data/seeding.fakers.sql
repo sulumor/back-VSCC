@@ -7,6 +7,7 @@ INSERT INTO "user"(firstname, email, password, is_admin) VALUES
 ('Essie', 'cifkurul@izawbus.cv', '$2b$12$WfNSMH0Yob5/JbuS4t9zYeSz1sZCDVCLlxcLS7fyt1EpNbiqxNaNa', false),
 ('Mario', 'di@puddiknun.uk', '$2b$12$WfNSMH0Yob5/JbuS4t9zYeSz1sZCDVCLlxcLS7fyt1EpNbiqxNaNa', true),
 ('Etta', 'nawadi@ehve.bo', '$2b$12$WfNSMH0Yob5/JbuS4t9zYeSz1sZCDVCLlxcLS7fyt1EpNbiqxNaNa', true),
+('Sulumor', 'jojoetromu@gmail.com', '$2b$12$WfNSMH0Yob5/JbuS4t9zYeSz1sZCDVCLlxcLS7fyt1EpNbiqxNaNa', true),
 ('Travis', 'jo@ocociec.jo', '$2b$12$WfNSMH0Yob5/JbuS4t9zYeSz1sZCDVCLlxcLS7fyt1EpNbiqxNaNa', false);
 
 INSERT INTO "trace"(strava_id, strava_hash, start, finish, switch, is_a_loop, distance, elevation, description,image) VALUES
