@@ -16,7 +16,9 @@ export default Joi.object({
     "string.base": "L'email doit être au format d'une chaîne de caractères",
     "string.email": "L'email donné n'est pas au format valide",
   }),
-  is_admin: Joi.boolean().default(false),
+  is_admin: Joi.boolean(),
+  is_resetting_password: Joi.boolean(),
+  reset_password_token: Joi.string().allow(null),
 })
   .min(1)
   .required()

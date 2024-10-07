@@ -61,33 +61,19 @@ usersRouter
    */
   .delete(controllerWrapper(UsersController.delete.bind(UsersController)));
 
-usersRouter
-  .route("/")
-  /**
-   * GET /api/users
-   * @summary Récupérer tous les utilisateurs
-   * @tags Users
-   * @return { User[] } 200 - Réponse en cas de succès - application/json
-   * @return { ApiJsonError } 400 - Réponse en cas de mauvais appel - application/json
-   * @return { ApiJsonError } 404 - Réponse en cas de réponse non trouvée - application/json
-   * @return { ApiJsonError } 500 - Réponse en cas de problème serveur - application/json
-   */
-  .get(controllerWrapper(UsersController.getAll.bind(UsersController)))
-
-  /**
-   * POST /api/users
-   * @summary Ajouter un nouvel utilisateur
-   * @tags Users
-   * @param { TraceBody } request.body.required - Information de la nouvelle trace
-   * @return { User } 200 - Réponse en cas de succès - application/json
-   * @return { ApiJsonError } 400 - Réponse en cas de mauvais appel - application/json
-   * @return { ApiJsonError } 404 - Réponse en cas de réponse non trouvée - application/json
-   * @return { ApiJsonError } 500 - Réponse en cas de problème serveur - application/json
-   */
-  .post(
-    validationMiddleware("body", UsersPostSchema),
-    controllerWrapper(UsersController.create.bind(UsersController))
-  );
+/**
+ * GET /api/users
+ * @summary Récupérer tous les utilisateurs
+ * @tags Users
+ * @return { User[] } 200 - Réponse en cas de succès - application/json
+ * @return { ApiJsonError } 400 - Réponse en cas de mauvais appel - application/json
+ * @return { ApiJsonError } 404 - Réponse en cas de réponse non trouvée - application/json
+ * @return { ApiJsonError } 500 - Réponse en cas de problème serveur - application/json
+ */
+usersRouter.get(
+  "/",
+  controllerWrapper(UsersController.getAll.bind(UsersController))
+);
 
 usersRouter.use((_, __, next) =>
   next(new ApiError("Ressources non trouvées", { httpStatus: 404 }))

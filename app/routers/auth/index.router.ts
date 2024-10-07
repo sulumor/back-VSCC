@@ -7,7 +7,7 @@ import validateMiddleware from "@/middlewares/validation.middleware";
 // ----- CONTROLLERS -----
 import AuthController from "@/controllers/auth/auth.controller";
 // ----- SCHEMAS -----
-import UserPostSchema from "@/schemas/api/users/post.schema";
+import RegisterSchema from "@/schemas/authentification/register.schema";
 import postSchema from "@/schemas/authentification/post.schema";
 import emailSchema from "@/schemas/authentification/email.schema";
 import resetPasswordSchema from "@/schemas/authentification/resetPassword.schema";
@@ -120,7 +120,7 @@ authRouter
 authRouter.post(
   "/register",
   Limiter.accountLogin,
-  validateMiddleware("body", UserPostSchema),
+  validateMiddleware("body", RegisterSchema),
   controllerWrapper(AuthController.register.bind(AuthController))
 );
 

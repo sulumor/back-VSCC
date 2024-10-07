@@ -12,7 +12,7 @@ CREATE FUNCTION "add_user"(json) RETURNS "user" AS $$
   );
 
   SELECT * FROM "user" WHERE "id" = (
-    SELECT "id" FROM "user" ORDER BY "id" DESC LIMIT 1
+    SELECT "id" FROM "user" ORDER BY "created_at" DESC LIMIT 1
   );
 
 $$ LANGUAGE sql STRICT;

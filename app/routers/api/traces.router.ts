@@ -37,7 +37,7 @@ tracesRouter
    * @return { ApiJsonError } 500 - Réponse en cas de problème serveur - application/json
    */
   .patch(
-    authenticateToken,
+    // authenticateToken,
     validationMiddleware("body", tracesPatchSchema),
     controllerWrapper(TracesController.update.bind(TracesController))
   )
