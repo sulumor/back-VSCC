@@ -7,13 +7,18 @@ export default class CoreController {
   static datamapper: {
     findAll: () => Promise<Traces | Users>;
     findByPk: (id: string) => Promise<Trace | User>;
+    findByParams: (params: { where: any }) => Promise<Traces | Users>;
     insert: (data: Partial<Trace | User>) => Promise<Trace | User>;
     update: (data: Partial<Trace | User>) => Promise<Trace | User>;
     delete: (id: string) => Promise<boolean>;
   };
 
-  static async getAll(_: any, res: Response, next: NextFunction) {
-    const rows = await this.datamapper.findAll();
+  static async getAll(req: Request, res: Response, next: NextFunction) {
+    let rows =
+      Object.keys(req.query).length === 0
+        ? await this.datamapper.findAll()
+        : await this.datamapper.findByParams({ where: req.query });
+
     if (!rows[0])
       return next(new ApiError("Ressources non trouvées", { httpStatus: 404 }));
     return res.status(200).json(rows);

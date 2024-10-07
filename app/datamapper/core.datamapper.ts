@@ -8,7 +8,9 @@ export default class CoreDatamapper {
   static updateTable: string;
 
   static async findAll() {
-    const result = await client.query(`SELECT * FROM "${this.tableName}"`);
+    const result = await client.query(
+      `SELECT * FROM "${this.tableName}" ORDER BY id`
+    );
     return result.rows;
   }
 
@@ -29,14 +31,23 @@ export default class CoreDatamapper {
       let indexPlaceholder = 1;
 
       Object.entries(params.where).forEach(([param, value]: [string, any]) => {
-        if (param === "or") {
-          const filtersOr: string[] = [];
-          Object.entries(value).forEach(([key, val]) => {
-            filtersOr.push(`"${key}" = $${indexPlaceholder}`);
-            values.push(val);
+        if (Array.isArray(value)) {
+          if (param === "distance") {
+            filters.push(`"${param}" >= $${indexPlaceholder}`);
+            values.push(value[0]);
             indexPlaceholder += 1;
-          });
-          filters.push(`(${filtersOr.join(" OR ")})`);
+            filters.push(`"${param}" <= $${indexPlaceholder}`);
+            values.push(value[1]);
+            indexPlaceholder += 1;
+          } else {
+            const filtersOr: string[] = [];
+            value.forEach((val) => {
+              filtersOr.push(`"${param}" = $${indexPlaceholder}`);
+              values.push(val);
+              indexPlaceholder += 1;
+            });
+            filters.push(`(${filtersOr.join(" OR ")})`);
+          }
         } else {
           filters.push(`"${param}" = $${indexPlaceholder}`);
           values.push(value);
@@ -45,6 +56,7 @@ export default class CoreDatamapper {
       });
       filter = `WHERE ${filters.join(" AND ")}`;
     }
+
     const result = await client.query(
       `SELECT * FROM "${this.tableName}" ${filter}`,
       values

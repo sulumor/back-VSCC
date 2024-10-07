@@ -154,15 +154,34 @@ export default class AuthController {
     if (existsUser)
       return next(new ApiError("Utilisateur existe déjà", { httpStatus: 400 }));
 
-    body.password = this.bcryptService.hashPassword(body.password);
+    body.password = this.bcryptService.hashPassword(
+      process.env.DEFAULT_PASSWORD || "D3f@ultPassword"
+    );
 
     const user: User = await UsersDatamapper.insert(body);
 
-    this.cookiesService.createRefreshTokenCookies(res, user);
+    const resetToken = createId();
 
-    return res
-      .status(200)
-      .json({ accessToken: this.jwtService.createAccessToken(user) });
+    await UsersDatamapper.update({
+      id: user.id,
+      is_resetting_password: true,
+      reset_password_token: resetToken,
+    });
+
+    const email = await this.mailerService.newUserEmail({
+      user,
+      token: resetToken,
+    });
+
+    if (!email)
+      return next(
+        new ApiError(
+          "Problème lors de l'envoi de l'email. Veuillez réessayer plus tard",
+          { httpStatus: 503 }
+        )
+      );
+
+    return res.status(204).end();
   }
 
   static getUserFromToken({ user }: RequestWithUser, res: Response) {
