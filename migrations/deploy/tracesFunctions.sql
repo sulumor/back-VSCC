@@ -4,7 +4,8 @@ BEGIN;
 
 
 CREATE FUNCTION "add_trace"(json) RETURNS "trace" AS $$
-  INSERT INTO "trace" (strava_id, strava_hash, start, finish, switch, is_a_loop, distance, elevation, description,image) VALUES (
+  INSERT INTO "trace" (title, strava_id, strava_hash, start, finish, switch, is_a_loop, distance, elevation, description,image) VALUES (
+    ($1->>'title'),
     ($1->>'strava_id'),
     ($1->>'strava_hash'),
     ($1->>'start'),
@@ -23,6 +24,7 @@ $$ LANGUAGE sql STRICT;
 
 CREATE FUNCTION "update_trace"(json) RETURNS "trace" AS $$
   UPDATE "trace" SET
+    "title" = COALESCE(($1->>'title'),"title"),
     "strava_id" = COALESCE(($1->>'strava_id'),"strava_id"),
     "strava_hash" = COALESCE(($1->>'strava_hash'), "strava_hash"),
     "start"= COALESCE(($1->>'start'),"start"),

@@ -5,6 +5,7 @@ export default Joi.object({
   strava_id: Joi.string().pattern(stravaIdRegex).required(),
   strava_hash: Joi.string().pattern(stravaHashRegex),
   start: Joi.string().required(),
+  title: Joi.string().required(),
   finish: Joi.string().required(),
   switch: Joi.string(),
   is_a_loop: Joi.boolean().default(false),

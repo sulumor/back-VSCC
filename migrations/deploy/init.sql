@@ -4,6 +4,7 @@ BEGIN;
 
 CREATE TABLE "trace" (
   "id" int GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  "title" text NOT NULL,
   "strava_id" text NOT NULL UNIQUE,
   "strava_hash" text DEFAULT null,
   "start" text NOT NULL DEFAULT 'Clichy',
