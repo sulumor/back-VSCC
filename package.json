@@ -10,9 +10,9 @@
     "prepare": "husky",
     "test": "jest",
     "start": "node dist/index.js",
-    "build": "node tsup index.ts --format cjs --clean",
+    "build": "tsup index.ts --format esm --clean",
     "db": "npm run db:create && npm run db:seeding",
-    "db:create": "psql -d VSCC -f app/data/create.structure.sql", 
+    "db:create": "psql -d VSCC -f app/data/create.structure.sql",
     "db:seeding": "psql -d VSCC -f app/data/seeding.fakers.sql"
   },
   "keywords": [
@@ -40,6 +40,7 @@
     "@types/jest": "^29.5.13",
     "@types/node": "^22.5.4",
     "@types/pg": "^8.11.10",
+    "@types/swagger-ui-express": "^4.1.6",
     "eslint": "^8.56.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.29.1",

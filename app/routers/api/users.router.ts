@@ -10,7 +10,6 @@ import {
 import controllerWrapper from "@/helpers/controller.wrapper";
 // ----- SCHEMAS
 import UsersPatchSchema from "@/schemas/api/users/patch.schema";
-import UsersPostSchema from "@/schemas/api/users/post.schema";
 
 const usersRouter = Router();
 
