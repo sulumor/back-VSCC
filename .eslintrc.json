@@ -10,6 +10,7 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
+  "ignorePatterns": ["dist"],
   "rules": {
     "quotes": ["error", "double"],
     "import/extensions": ["error", "always"],
