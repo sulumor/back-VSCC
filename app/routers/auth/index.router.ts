@@ -12,7 +12,7 @@ import postSchema from "@/schemas/authentification/post.schema";
 import emailSchema from "@/schemas/authentification/email.schema";
 import resetPasswordSchema from "@/schemas/authentification/resetPassword.schema";
 import ApiError from "@/errors/api.error";
-import { authenticateTokenWithoutExp } from "@/middlewares/authorization.middleware";
+import { authenticateRefreshToken } from "@/middlewares/authorization.middleware";
 
 const authRouter = Router();
 
@@ -79,7 +79,7 @@ authRouter.post(
 authRouter.get(
   "/user",
   Limiter.accountLogin,
-  authenticateTokenWithoutExp,
+  authenticateRefreshToken,
   controllerWrapper(AuthController.getUserFromToken.bind(AuthController))
 );
 

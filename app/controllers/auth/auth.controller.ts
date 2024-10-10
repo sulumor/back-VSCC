@@ -8,13 +8,11 @@ import { Request, Response, NextFunction } from "express";
 // ----- SERVICES -----
 import MailerService from "@/services/mailer.service";
 import BcryptService from "@/services/bcrypt.service";
-import CookiesService from "@/services/cookies.service";
 import JWTService from "@/services/jwt.service";
 
 export default class AuthController {
   private static mailerService: MailerService = new MailerService();
   private static bcryptService: BcryptService = new BcryptService();
-  private static cookiesService: CookiesService = new CookiesService();
   private static jwtService: JWTService = new JWTService();
 
   static async forgotPassword(
@@ -114,27 +112,21 @@ export default class AuthController {
     if (!this.bcryptService.comparePassword(body.password, user.password))
       return next(new ApiError(errorMessage, errorInfos));
 
-    this.cookiesService.createRefreshTokenCookies(res, user);
+    // this.cookiesService.createRefreshTokenCookies(res, user);
 
-    return res
-      .status(200)
-      .json({ accessToken: this.jwtService.createAccessToken(user) });
+    return res.status(200).json({
+      accessToken: this.jwtService.createAccessToken(user),
+      refreshToken: this.jwtService.createRefreshToken(user),
+    });
   }
 
   static refreshToken(
-    { signedCookies }: Partial<Request>,
+    { headers }: Partial<Request>,
     res: Response,
     next: NextFunction
   ) {
-    if (!signedCookies || !signedCookies.refresh_token)
-      return next(
-        new ApiError(
-          "Veuillez vous connecter pour poursuivre la visite de notre site",
-          { httpStatus: 404 }
-        )
-      );
-
-    this.jwtService.haveNewAccessToken(signedCookies.refresh_token, res, next);
+    if (!headers) return;
+    this.jwtService.haveNewAccessToken(headers, res, next);
   }
 
   static deleteToken(_: any, res: Response) {
@@ -185,7 +177,6 @@ export default class AuthController {
   }
 
   static getUserFromToken({ user }: RequestWithUser, res: Response) {
-    this.cookiesService.createRefreshTokenCookies(res, user as User);
     return res
       .status(200)
       .json({ accessToken: this.jwtService.createAccessToken(user as User) });

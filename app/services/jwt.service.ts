@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { Response, NextFunction } from "express";
 import ApiError from "../errors/api.error";
 import UsersDatamapper from "../datamapper/users.datamapper";
+import { IncomingHttpHeaders } from "http";
 
 export default class JWTService {
   private accessSecretToken: string;
@@ -15,18 +16,37 @@ export default class JWTService {
   }
 
   createAccessToken({ id, firstname, email, is_admin }: User) {
-    return jwt.sign({ id, firstname, is_admin }, this.accessSecretToken, {
-      expiresIn: 20,
-    });
+    return jwt.sign(
+      { id, firstname, email, is_admin },
+      this.accessSecretToken,
+      {
+        expiresIn: 20,
+      }
+    );
   }
 
   createRefreshToken({ id }: User) {
     return jwt.sign({ id }, this.refreshSecretToken, {
-      expiresIn: "14 days",
+      expiresIn: "1 days",
     });
   }
 
-  haveNewAccessToken(refreshToken: string, res: Response, next: NextFunction) {
+  haveNewAccessToken(
+    { authorization }: IncomingHttpHeaders,
+    res: Response,
+    next: NextFunction
+  ) {
+    if (!authorization)
+      return next(
+        new ApiError("Authentification nécessaire", { httpStatus: 401 })
+      );
+    const refreshToken = authorization.split(" ")[1];
+
+    if (!refreshToken)
+      return next(new ApiError("Token invalide", { httpStatus: 401 }));
+
+    if (!process.env.REFRESH_TOKEN_SECRET)
+      return next(new ApiError("Manque clef du token", { httpStatus: 500 }));
     jwt.verify(refreshToken, this.refreshSecretToken, async (err, payload) => {
       if (err) return next(new ApiError(err.message, { httpStatus: 403 }));
       if (!payload || typeof payload === "string")

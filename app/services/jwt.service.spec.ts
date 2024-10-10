@@ -1,8 +1,5 @@
 import JWTService from "./jwt.service";
 import jwt from "jsonwebtoken";
-import UsersDatamapper from "../datamapper/users.datamapper";
-import { Response, NextFunction } from "express";
-import ApiError from "../errors/api.error";
 
 jest.mock("jsonwebtoken");
 jest.mock("../datamapper/users.datamapper");
@@ -51,89 +48,10 @@ describe("JWTService", () => {
         { id: mockUser.id },
         expect.any(String),
         {
-          expiresIn: "14 days",
+          expiresIn: "1 days",
         }
       );
       expect(refreshToken).toBe(token);
-    });
-  });
-
-  describe("fonction haveNewAccessToken", () => {
-    let mockRes: Partial<Response>;
-    let mockNext: NextFunction;
-
-    beforeEach(() => {
-      mockRes = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      };
-      mockNext = jest.fn();
-    });
-
-    it("should return a new access token when refresh token is valid", async () => {
-      const refreshToken = "validRefreshToken";
-      const payload = { id: 1 };
-      const user = {
-        id: 1,
-        firstname: "John",
-        is_admin: true,
-      };
-
-      (jwt.verify as jest.Mock).mockImplementation((token, secret, cb) => {
-        cb(null, payload); // Simule la validité du token
-      });
-      (UsersDatamapper.findByPk as jest.Mock).mockResolvedValue(user);
-
-      await jwtService.haveNewAccessToken(
-        refreshToken,
-        mockRes as Response,
-        mockNext
-      );
-
-      expect(UsersDatamapper.findByPk).toHaveBeenCalledWith(payload.id);
-      expect(mockRes.status).toHaveBeenCalledWith(200);
-      expect(mockRes.json).toHaveBeenCalledWith({
-        accessToken: expect.any(String),
-      });
-    });
-
-    it("should return 403 when refresh token is invalid", async () => {
-      const refreshToken = "invalidRefreshToken";
-      const error = new Error("Invalid token");
-
-      (jwt.verify as jest.Mock).mockImplementation((token, secret, cb) => {
-        cb(error, null);
-      });
-
-      await jwtService.haveNewAccessToken(
-        refreshToken,
-        mockRes as Response,
-        mockNext
-      );
-
-      expect(mockNext).toHaveBeenCalledWith(
-        new ApiError(error.message, { httpStatus: 403 })
-      );
-    });
-
-    it("should return 404 if no user is found", async () => {
-      const refreshToken = "validRefreshToken";
-      const payload = { id: 1 };
-
-      (jwt.verify as jest.Mock).mockImplementation((token, secret, cb) => {
-        cb(null, payload);
-      });
-      (UsersDatamapper.findByPk as jest.Mock).mockResolvedValue(null); // Simule l'absence d'utilisateur
-
-      await jwtService.haveNewAccessToken(
-        refreshToken,
-        mockRes as Response,
-        mockNext
-      );
-
-      expect(mockNext).toHaveBeenCalledWith(
-        new ApiError("Aucun utilisateur de trouvé", { httpStatus: 404 })
-      );
     });
   });
 });

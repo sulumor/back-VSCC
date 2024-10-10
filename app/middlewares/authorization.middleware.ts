@@ -27,7 +27,14 @@ function authenticateToken(req: RequestWithUser, _: any, next: NextFunction) {
       return next(
         new ApiError("Authentification nécessaire", { httpStatus: 401 })
       );
-    const userExits: User = await UsersDatamapper.findByPk(user.id);
+    const [userExits]: Users = await UsersDatamapper.findByParams({
+      where: {
+        id: user.id,
+        email: user.email,
+        firstname: user.firstname,
+        is_admin: user.is_admin,
+      },
+    });
     if (!userExits)
       return next(new ApiError("Accès interdit", { httpStatus: 403 }));
     req.user = user;
@@ -35,7 +42,7 @@ function authenticateToken(req: RequestWithUser, _: any, next: NextFunction) {
   });
 }
 
-function authenticateTokenWithoutExp(
+function authenticateRefreshToken(
   req: RequestWithUser,
   _: any,
   next: NextFunction
@@ -49,33 +56,64 @@ function authenticateTokenWithoutExp(
 
   if (!token) return next(new ApiError("Token invalide", { httpStatus: 401 }));
 
-  if (!process.env.ACCESS_TOKEN_SECRET)
+  if (!process.env.REFRESH_TOKEN_SECRET)
     return next(new ApiError("Manque clef du token", { httpStatus: 500 }));
 
-  jwt.verify(
-    token,
-    process.env.ACCESS_TOKEN_SECRET,
-    { ignoreExpiration: true },
-    async (err, user) => {
-      if (err) next(new ApiError(err.message, { httpStatus: 403 }));
-      if (!user || typeof user === "string")
-        return next(
-          new ApiError("Authentification nécessaire", { httpStatus: 401 })
-        );
-      const [userExits]: Users = await UsersDatamapper.findByParams({
-        where: {
-          id: user.id,
-          firstname: user.firstname,
-          is_admin: user.is_admin,
-        },
-      });
-      if (!userExits)
-        return next(new ApiError("Accès interdit", { httpStatus: 403 }));
-      req.user = user;
-      next();
-    }
-  );
+  jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, async (err, user) => {
+    if (err) next(new ApiError(err.message, { httpStatus: 403 }));
+    if (!user || typeof user === "string")
+      return next(
+        new ApiError("Authentification nécessaire", { httpStatus: 401 })
+      );
+    const userExits: User = await UsersDatamapper.findByPk(user.id);
+    if (!userExits)
+      return next(new ApiError("Accès interdit", { httpStatus: 403 }));
+    req.user = userExits;
+    next();
+  });
 }
+
+// function authenticateTokenWithoutExp(
+//   req: RequestWithUser,
+//   _: any,
+//   next: NextFunction
+// ) {
+//   const authHeader = req.headers.authorization;
+//   if (!authHeader)
+//     return next(
+//       new ApiError("Authentification nécessaire", { httpStatus: 401 })
+//     );
+//   const token = authHeader.split(" ")[1];
+
+//   if (!token) return next(new ApiError("Token invalide", { httpStatus: 401 }));
+
+//   if (!process.env.ACCESS_TOKEN_SECRET)
+//     return next(new ApiError("Manque clef du token", { httpStatus: 500 }));
+
+//   jwt.verify(
+//     token,
+//     process.env.ACCESS_TOKEN_SECRET,
+//     { ignoreExpiration: true },
+//     async (err, user) => {
+//       if (err) next(new ApiError(err.message, { httpStatus: 403 }));
+//       if (!user || typeof user === "string")
+//         return next(
+//           new ApiError("Authentification nécessaire", { httpStatus: 401 })
+//         );
+//       const [userExits]: Users = await UsersDatamapper.findByParams({
+//         where: {
+//           id: user.id,
+//           firstname: user.firstname,
+//           is_admin: user.is_admin,
+//         },
+//       });
+//       if (!userExits)
+//         return next(new ApiError("Accès interdit", { httpStatus: 403 }));
+//       req.user = user;
+//       next();
+//     }
+//   );
+// }
 
 function isAdmin(req: RequestWithUser, _: any, next: NextFunction) {
   if (!req.user || typeof req.user === "string")
@@ -87,4 +125,4 @@ function isAdmin(req: RequestWithUser, _: any, next: NextFunction) {
   return next();
 }
 
-export { authenticateToken, isAdmin, authenticateTokenWithoutExp };
+export { authenticateToken, isAdmin, authenticateRefreshToken };
